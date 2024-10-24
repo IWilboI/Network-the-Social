@@ -28,4 +28,3 @@ router.post('/', authenticate, async (req, res) => {
     }
 });
 
-// Other protected routes (update, delete) can be added similarly
