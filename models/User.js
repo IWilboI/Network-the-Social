@@ -1,6 +1,7 @@
-const { Schema, model } = require('mongoose');
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
-const userSchema = new Schema({
+const UserSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
@@ -11,22 +12,39 @@ const userSchema = new Schema({
     type: String,
     required: true,
     unique: true,
-    match: [/.+@.+\..+/, 'Must match an email address!'],
+    match: [/.+@.+\..+/, 'Please enter a valid e-mail address'],
+  },
+  password: {
+    type: String,
+    required: true,
   },
   thoughts: [
     {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Thought',
     },
   ],
   friends: [
     {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
   ],
 });
 
-const User = model('User', userSchema);
+// Hash password before saving
+UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    return next();
+  }
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
 
+// Compare password
+UserSchema.methods.isCorrectPassword = function (password) {
+  return bcrypt.compare(password, this.password);
+};
+
+const User = mongoose.model('User', UserSchema);
 module.exports = User;

@@ -1,24 +1,29 @@
-const { User } = require('../models/User');
+const User = require('../models/User');
+const jwt = require('jsonwebtoken');
 
-
-
-module.exports = {
-  getUsers(req, res) {
-    User.find()
-      .then((users) => res.json(users))
-      .catch((err) => res.status(500).json(err));
-  },
-  getSingleUser(req, res) {
-    User.findOne({ _id: req.params.userId })
-      .populate('thoughts')
-      .populate('friends')
-      .then((user) => res.json(user))
-      .catch((err) => res.status(500).json(err));
-  },
-  createUser(req, res) {
-    User.create(req.body)
-      .then((user) => res.json(user))
-      .catch((err) => res.status(500).json(err));
-  },
-  
+const registerUser = async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const user = new User({ username, password });
+        await user.save();
+        res.status(201).json({ message: 'User registered successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 };
+
+const loginUser = async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const user = await User.findOne({ username });
+        if (!user || !(await user.comparePassword(password))) {
+            return res.status(400).json({ message: 'Invalid credentials' });
+        }
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.json({ token });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+module.exports = { registerUser, loginUser };
