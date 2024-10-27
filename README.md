@@ -25,6 +25,7 @@ THEN I am able to successfully create and delete reactions to thoughts and add a
 # Start command:  npm run start #
 # Seed command: mongod #
 ```
+## YouTube Walkthrough Video: https://www.youtube.com/watch?v=v2-9WZ53NlY ##
 
 # Start command:  npm run start #
 # Seed command: mongod #
