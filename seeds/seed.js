@@ -17,6 +17,11 @@ const userData = [
     email: 'janedoe@example.com',
     password: 'password456',
   },
+  {
+    username: 'IWilboI',
+    email: 'IWilboI@IWilboI.com',
+    password: 'IWilboI',
+  }
 ];
 
 const thoughtData = [
@@ -28,6 +33,10 @@ const thoughtData = [
     content: 'I love programming!',
     username: 'janedoe',
   },
+  {
+    content: 'STRUGGLE',
+    username: 'IWilboI',
+  }
 ];
 
 const seedDatabase = async () => {

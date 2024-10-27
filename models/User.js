@@ -1,50 +1,46 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const { Schema, model } = require('mongoose');
 
-const UserSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    match: [/.+@.+\..+/, 'Please enter a valid e-mail address'],
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  thoughts: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Thought',
+// User Schema
+const userSchema = new Schema(
+  {
+    username: {
+      type: String,
+      unique: true,
+      required: true,
+      trim: true,
     },
-  ],
-  friends: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      match: [/.+@.+\..+/, 'Must use a valid email address'],
     },
-  ],
-});
-
-// Hash password before saving
-UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    return next();
+    thoughts: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Thought',
+      },
+    ],
+    friends: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
+  },
+  {
+    toJSON: {
+      virtuals: true,
+    },
+    id: false,
   }
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
+);
+
+// Virtual for friend count
+userSchema.virtual('friendCount').get(function () {
+  return this.friends.length;
 });
 
-// Compare password
-UserSchema.methods.isCorrectPassword = function (password) {
-  return bcrypt.compare(password, this.password);
-};
+const User = model('User', userSchema);
 
-const User = mongoose.model('User', UserSchema);
 module.exports = User;

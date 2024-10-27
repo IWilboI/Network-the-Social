@@ -11,6 +11,7 @@ const authenticate = (req, res, next) => {
     if (err) {
       return res.status(401).json({ message: 'Invalid token' });
     }
+    console.log('Decoded user:', decoded);  // Log the decoded user object
     req.user = decoded;
     next();
   });
